@@ -4,7 +4,7 @@ SUFFIX="_hocus_pocus"
 set -e
 
 # Compile the kernel
-make
+make -j2
 # Compile and install modules
 make modules_install
 
