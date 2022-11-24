@@ -1,0 +1,31 @@
+--- linux-5.19.14/arch/x86/entry/syscalls/syscall_64.tbl	2022-10-05 14:10:55.000000000 +0530
++++ linux-5.19.14--kernel/arch/x86/entry/syscalls/syscall_64.tbl	2022-11-23 16:09:25.590015064 +0530
+@@ -372,7 +372,7 @@
+ 448	common	process_mrelease	sys_process_mrelease
+ 449	common	futex_waitv		sys_futex_waitv
+ 450	common	set_mempolicy_home_node	sys_set_mempolicy_home_node
+-
++451     common  kernel_2d_memcpy        sys_kernel_2d_memcpy
+ #
+ # Due to a historical design error, certain syscalls are numbered differently
+ # in x32 as compared to native x86_64.  These syscalls have numbers 512-547.
+--- linux-5.19.14/kernel/sys.c	2022-10-05 14:10:55.000000000 +0530
++++ linux-5.19.14--kernel/kernel/sys.c	2022-11-23 16:08:11.900013807 +0530
+@@ -206,7 +206,16 @@
+ out:
+ 	return error;
+ }
+-
++SYSCALL_DEFINE4(kernel_2d_memcpy,float *,a1,float *,a2,int,n,int,m){
++	float t[n][m];
++	if(copy_from_user(&t,a2,sizeof(t))!=0){
++			return -EFAULT;
++		}
++	if(copy_to_user(a1,&t,sizeof(t))!=0){
++			return -EFAULT;
++		}
++	return 0;
++}
+ SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
+ {
+ 	struct task_struct *g, *p;
